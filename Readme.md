@@ -1,0 +1,1 @@
+Esse projeto visa criar um eletro estimulador que consiga auxiliar pessoas com fraqueza nas mãos ou nos braços.
