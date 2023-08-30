@@ -1,6 +1,8 @@
 #include <BleKeyboard.h>
 BleKeyboard bleKeyboard;
- 
+
+#define FN = 10;
+
  //Inicializando variáveis
 const int sensorPin[5] = {33, 32, 35, 34, 39}; //definicao pinos sensores
 
@@ -8,7 +10,7 @@ const int ledPin = 2; //pino do led
 const int btnPin = 26; //pino do botao
 
 const int sensnum = 3;    // numero de sensores
-const int maxref = 4095;  // 1023 para arduino 4095 para esp
+const int maxref = 1023;  // 1023 para arduino 4095 para esp
 const int speeds = 250000; //velociade do serial
 const int filtro = 100; //numeros de amostras do filtro
 const int caltime = 4000; //tempo de calibracao em ms
@@ -26,7 +28,7 @@ void zeraref(); //zera mat de ref
 void setup()
 {
   pinMode(ledPin, OUTPUT);
-  pinMode(btnPin, INPUT_PULLUP);
+  pinMode(btnPin, INPUT_PULLUP);//botão de pull up
 
   bleKeyboard.begin();
 
@@ -77,13 +79,15 @@ void loop()
 {
   if (bleKeyboard.isConnected()) {
     //faz leitura, mapeamento e filtro
-    for (int i = 0 ; i < filtro ; i++)
+    for (int i = 0 ; i < filtro ; i++)//100 é muito
     {
       for (int j = 0 ; j < sensnum ; j++)
       {
         sensorvalue[j][0] = analogRead(sensorPin[j]);
         sensorvalue[j][0] = constrain(sensorvalue[j][0], sensorvalue[j][1], sensorvalue[j][2]);//rever esse sensor value j1 e j2
-        sensorvalue[j][0] = map(sensorvalue[j][0], sensorvalue[j][1], sensorvalue[j][2], 0, 500);
+        sensorvalue[j][0] = map(sensorvalue[j][0], sensorvalue[j][1], sensorvalue[j][2], 0, 500);//Conversão vai depender da escala
+        //o map pode até funcinar só pra mostrar o valor que ta chegando, mas precisamos de outra conver
+        //ção pq a gente vai ter que ver qual é a amplificação que vamos querer fazer
         sensorvalueF[j] += sensorvalue[j][0];
       }
     }
@@ -111,7 +115,7 @@ void loop()
       }
     }
     Serial.println();
-    while (!digitalRead(btnPin)) {//pq o "!"
+    while (!digitalRead(btnPin)) {//se apertar o botão ele vai calibrar
       if (first) {
         reftime = millis(); //t1
         first = false;
